@@ -4,9 +4,19 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    Rigidbody2D rb; // para podermos aplicar velo
+
+    
+    public Transform groundCheck;
+    public LayerMask layerground;
     public float speed = 10f;
+    public float jumpforce = 200f;
+
+
+    Rigidbody2D rb; 
     SpriteRenderer sprite;
+    bool isfloor = false;
+    bool isJumping = false;
+
 
     // Start is called before the first frame update
     void Start()
@@ -18,7 +28,12 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        isfloor = Physics2D.Linecast(transform.position, groundCheck.position, layerground);     
+
+        if(Input.GetButtonDown("Jump") && isfloor == true)
+        {
+            isJumping = true;
+        }
     }
 
     void FixedUpdate() 
@@ -31,11 +46,27 @@ public class PlayerController : MonoBehaviour
         {
             Flip();
         }
+
+        if(isJumping)
+        {
+            rb.AddForce(new Vector2(0, jumpforce));
+            isJumping = false;
+        }
     }
 
     void Flip()
     {
         sprite.flipX = !sprite.flipX;
         
+    }
+
+    void Movimentacao()
+    {
+
+    }
+
+    void Inputs()
+    {
+
     }
 }
