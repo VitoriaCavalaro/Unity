@@ -1,17 +1,24 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
 
-    
-   // public Transform groundCheck;
+    [Header("Variaveis de Movimentação")]
+    public Transform groundCheck;
     public LayerMask layerground;
     public float speed = 10f;
     public float jumpforce = 200f;
     public float radius = 0.2f;
-  
+
+    [Header("Variaveis de Ataque")]
+    public Transform atkCheck;
+    public float radiusAtk;
+    public LayerMask layerEnemies; //layerobjetos dps criar
+    float timeNextAtk;
+    public Enemy scriptenemy;
 
 
     Rigidbody2D rb; 
@@ -36,6 +43,7 @@ public class PlayerController : MonoBehaviour
         Movimentacao();
         Inputs();
         CheckJump();
+        
     }
 
     
@@ -48,6 +56,7 @@ public class PlayerController : MonoBehaviour
         if ((move > 0 && sprite.flipX == true) || (move < 0 && sprite.flipX == false))
         {
             sprite.flipX = !sprite.flipX;
+            atkCheck.localPosition = new Vector2(-atkCheck.localPosition.x, atkCheck.localPosition.y);
         }
     }
 
@@ -60,16 +69,42 @@ public class PlayerController : MonoBehaviour
             extraJumps--;
         }
 
+        if(timeNextAtk <= 0)
+        {
+            if (Input.GetButtonDown("Fire1") && rb.velocity == new Vector2 (0,0))
+            {
+                anim.SetTrigger("Atack");
+                timeNextAtk = 0.2f;
+                
+            }
+        }
+        else
+        {
+            timeNextAtk -= Time.deltaTime;
+        }
+         
+    }
+
+    public void Attack()
+    {
+        Collider2D [] enemiesAttack = Physics2D.OverlapCircleAll(atkCheck.position, radiusAtk, layerEnemies);
+        for(int i = 0; i < enemiesAttack.Length; i++)
+        {
+            scriptenemy.TomouDano();
+            Debug.Log(enemiesAttack[i].name);
+        }
         
     }
+
+
 
     void CheckJump()
     {
         //isfloor = Physics2D.Linecast(transform.position, groundCheck.position, layerground); // verifica se esta no chao mas é melyhor usar o overlap pq se ficar na beirada nao cai.
 
-        //isfloor = Physics2D.OverlapCircle(groundCheck.position, radius, layerground); // cria o circle de verificacao do chao 
+        //isfloor = rb.IsTouchingLayers(layerground); //checa diretamente a layer, é bom pra usar se tiver uma parede na layer mas podemos criar outra layer pra parede 
 
-        isfloor = rb.IsTouchingLayers(layerground); //checa diretamente a layer, é bom pra usar se tiver uma parede na layer mas podemos criar outra layer pra parede 
+        isfloor = Physics2D.OverlapCircle(groundCheck.position, radius, layerground); // cria o circle de verificacao do chao . Melhor forma
 
         if (isJumping) // checa se esta no chao
         {
@@ -89,25 +124,16 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    //private void OnDrawGizmosSelected() // usa junto com o overlapcircle
-    //{
-    //    Gizmos.color = Color.red;
-    //    Gizmos.DrawWireSphere(groundCheck.position, radius);
-    //}
+    private void OnDrawGizmosSelected() // usa junto com o overlapcircle
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(groundCheck.position, radius);
+        Gizmos.DrawWireSphere(atkCheck.position, radiusAtk);
+    }
 
     void PlayerAnimation()
     {
-        if(rb.velocity.x == 0 && rb.velocity.y == 0) // corpo parado
-        {
-            anim.Play("Idle");
-        }
-        else if (rb.velocity.x != 0 && rb.velocity.y == 0) // corpo movendo no eixo x
-        {
-            anim.Play("Walk");
-        }
-        else if (rb.velocity.y != 0) // corpo movendo no eixo y
-        {
-            anim.Play("Jump");
-        }
+        anim.SetFloat("VelX",  Mathf.Abs(rb.velocity.x));
+        anim.SetFloat("VelY", Mathf.Abs(rb.velocity.y));
     }
 }
