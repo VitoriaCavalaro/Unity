@@ -2,9 +2,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
+    [Header("Caracteristicas do Player")]
+    public bool IsAlive = true;
+    public int health = 5;
+    public Transform posInicial;
+    
 
     [Header("Variaveis de Movimentação")]
     public Transform groundCheck;
@@ -34,15 +40,25 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         sprite = GetComponent<SpriteRenderer>();
         anim = GetComponent<Animator>();
+
+        transform.position = posInicial.position;
+        health = 5;
     }
 
 
     void Update()
     {
-        PlayerAnimation();
-        Movimentacao();
-        Inputs();
-        CheckJump();
+        if(IsAlive == true)
+        {
+            PlayerAnimation();
+            Movimentacao();
+            Inputs();
+            CheckJump();
+        }
+        else
+        {
+            PlayerMorreu();
+        }
         
     }
 
@@ -85,6 +101,15 @@ public class PlayerController : MonoBehaviour
          
     }
 
+    public void PerdeVida()
+    {
+        health--;
+        if (health <= 0)
+        {
+            IsAlive = false;
+        }
+    }
+
     public void Attack()
     {
         Collider2D [] enemiesAttack = Physics2D.OverlapCircleAll(atkCheck.position, radiusAtk, layerEnemies);
@@ -95,8 +120,6 @@ public class PlayerController : MonoBehaviour
         }
         
     }
-
-
 
     void CheckJump()
     {
@@ -136,4 +159,21 @@ public class PlayerController : MonoBehaviour
         anim.SetFloat("VelX",  Mathf.Abs(rb.velocity.x));
         anim.SetFloat("VelY", Mathf.Abs(rb.velocity.y));
     }
+
+    public void PlayerMorreu()
+    {
+        if(IsAlive == false)
+        {
+            Invoke("ReloadLevel", 0.5f);
+        }
+        
+
+    }
+
+    void ReloadLevel()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+
 }

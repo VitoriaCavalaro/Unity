@@ -65,7 +65,9 @@
   <ItemGroup>
     <Compile Include="Assets\Scripts\CameraMov.cs" />
     <Compile Include="Assets\Scripts\Enemy.cs" />
-    <Compile Include="Assets\Scripts\PlayerController.cs" />
+    <Compile Include="Assets\Scripts\Hud\HealthBar.cs" />
+    <Compile Include="Assets\Scripts\Player\Interagiveis.cs" />
+    <Compile Include="Assets\Scripts\Player\PlayerController.cs" />
     <None Include="Assets\Knight Files\Knight Files\Read Me.txt" />
     <Reference Include="Unity.Timeline.Editor">
       <HintPath>D:/AAESTUDOS/GamesGit/Unity/Estudos/Mecanicas2D/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
